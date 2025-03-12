@@ -133,10 +133,11 @@
       </div>
     </div>
 
-    <!-- لود کردن ویجت -->
-    <script src="./EyeglassWidget.js"></script>
+    <!-- لود کردن ویجت - فقط از طریق فایل اصلی که webpack آن را تولید می‌کند -->
+    <!-- <script src="./EyeglassWidget.js"></script> -->
 
-    <!-- راه‌اندازی ویجت در صفحه دمو بدون apiEndpoint -->
+    <!-- راه‌اندازی ویجت در صفحه دمو - این کد را حذف می‌کنیم چون خود index.js به صورت خودکار ویجت را راه‌اندازی می‌کند -->
+    <!-- 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         if (typeof EyeglassWidget === "function") {
@@ -150,5 +151,6 @@
         }
       });
     </script>
+    -->
   </body>
 </html>
