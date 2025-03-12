@@ -4,7 +4,7 @@
 class EyeglassWidget {
   /**
    * @param {Object} options - تنظیمات ویجت
-   * @param {string} options.apiEndpoint - آدرس API تشخیص چهره
+   * @param {string} [options.apiEndpoint] - آدرس API تشخیص چهره (اختیاری)
    * @param {string} [options.buttonText] - متن دکمه باز کردن ویجت
    * @param {string} [options.floatingButton] - آیا دکمه به صورت شناور نمایش داده شود
    * @param {string} [options.position] - موقعیت دکمه شناور ('right' یا 'left')
@@ -13,7 +13,7 @@ class EyeglassWidget {
   constructor(options) {
     // تنظیمات پیش‌فرض
     this.config = {
-      apiEndpoint: "http://localhost:8000/api/v1/analyze", // مقدار پیش‌فرض
+      apiEndpoint: "https://api.example.com/api/v1/analyze", // مقدار پیش‌فرض
       buttonText: "پیشنهاد فریم عینک",
       floatingButton: true, // به صورت پیش‌فرض، دکمه شناور است
       position: "left", // به صورت پیش‌فرض، دکمه سمت چپ قرار می‌گیرد
@@ -34,15 +34,6 @@ class EyeglassWidget {
       autoInitialize: true,
       ...options,
     };
-
-    // حذف بررسی اجباری آدرس API - از مقدار پیش‌فرض استفاده می‌کنیم
-    // با این کار ویجت حتی بدون مشخص کردن API نیز نمایش داده می‌شود
-    /*
-    if (!this.config.apiEndpoint) {
-      console.error("آدرس API تشخیص چهره باید مشخص شود");
-      return;
-    }
-    */
 
     // دسترسی‌های دوربین
     this.stream = null;
@@ -550,6 +541,19 @@ class EyeglassWidget {
       data.recommended_frames.forEach((frame) => {
         // تنظیم قیمت
         const price = parseInt(frame.price).toLocaleString("fa-IR");
+        let regularPrice = "";
+
+        // اگر قیمت اصلی وجود داشت و با قیمت فعلی متفاوت بود، نمایش تخفیف
+        if (frame.regular_price && frame.regular_price !== frame.price) {
+          regularPrice = parseInt(frame.regular_price).toLocaleString("fa-IR");
+        }
+
+        // محاسبه امتیاز تطابق به صورت درصد (اگر موجود باشد)
+        const matchScoreText = frame.match_score
+          ? `<div class="eyeglass-widget-frame-match-score">
+              <span class="eyeglass-widget-match-percentage">${frame.match_score}%</span> تطابق
+             </div>`
+          : "";
 
         // ایجاد عنصر کارت
         const frameCard = document.createElement("div");
@@ -563,13 +567,27 @@ class EyeglassWidget {
 
         // پر کردن محتوای کارت
         frameCard.innerHTML = `
-            <img class="eyeglass-widget-frame-image" src="${frameImage}" alt="${frame.name}">
+            <div class="eyeglass-widget-frame-image-container">
+              <img class="eyeglass-widget-frame-image" src="${frameImage}" alt="${
+          frame.name
+        }">
+              ${matchScoreText}
+            </div>
             <div class="eyeglass-widget-frame-details">
               <div class="eyeglass-widget-frame-name">${frame.name}</div>
-              <div class="eyeglass-widget-frame-type">نوع: ${frame.frame_type}</div>
-              <div class="eyeglass-widget-frame-price">${price} تومان</div>
+              <div class="eyeglass-widget-frame-type">${frame.frame_type}</div>
+              <div class="eyeglass-widget-frame-price-container">
+                ${
+                  regularPrice
+                    ? `<span class="eyeglass-widget-frame-regular-price">${regularPrice} تومان</span>`
+                    : ""
+                }
+                <span class="eyeglass-widget-frame-price">${price} تومان</span>
+              </div>
               <div class="eyeglass-widget-frame-action">
-                <a href="${frame.permalink}" target="_blank" class="eyeglass-widget-view-product">
+                <a href="${
+                  frame.permalink
+                }" target="_blank" class="eyeglass-widget-view-product">
                   ${this.config.viewProductText}
                 </a>
               </div>

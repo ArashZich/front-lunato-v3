@@ -36,9 +36,6 @@ if (typeof window !== "undefined") {
           new EyeglassWidget(config);
         } else {
           // جستجوی تنظیمات اصلی از ویژگی‌های data
-          const apiEndpoint =
-            currentScript.getAttribute("data-api-endpoint") ||
-            "http://localhost:8000/api/v1/analyze";
           const floatingButton =
             currentScript.getAttribute("data-floating-button") !== "false";
           const position =
@@ -47,25 +44,31 @@ if (typeof window !== "undefined") {
             currentScript.getAttribute("data-button-text") ||
             "پیشنهاد فریم عینک";
 
-          // ایجاد نمونه جدید از ویجت (همیشه اجرا می‌شود حتی بدون apiEndpoint)
-          new EyeglassWidget({
-            apiEndpoint,
+          // اگر data-api-endpoint وجود داشت، از آن استفاده می‌کنیم
+          const config = {
             floatingButton,
             position,
             buttonText,
-          });
+          };
+
+          const apiEndpoint = currentScript.getAttribute("data-api-endpoint");
+          if (apiEndpoint) {
+            config.apiEndpoint = apiEndpoint;
+          }
+
+          // ایجاد نمونه جدید از ویجت
+          new EyeglassWidget(config);
         }
       } catch (error) {
         console.error("خطا در راه‌اندازی ویجت:", error);
       }
     } else {
       // اگر اسکریپت با ویژگی data-eyeglass-widget یافت نشد،
-      // یک نمونه آزمایشی با آدرس API پیش‌فرض ایجاد می‌کنیم
+      // یک نمونه آزمایشی ایجاد می‌کنیم
       // این فقط برای محیط توسعه است
       if (document.querySelector("body.eyeglass-widget-demo")) {
         console.log("راه‌اندازی خودکار ویجت در حالت دمو...");
         new EyeglassWidget({
-          apiEndpoint: "http://localhost:8000/api/v1/analyze", // باید با آدرس API واقعی جایگزین شود
           floatingButton: true,
           position: "left",
           buttonText: "پیشنهاد فریم عینک",

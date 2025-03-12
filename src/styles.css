@@ -7,31 +7,35 @@
 
 /* Button styles */
 .eyeglass-widget-button {
-  background-color: #4a90e2;
-  color: white;
+  background-color: #feda50;
+  color: #333;
   border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
+  border-radius: 8px;
+  padding: 12px 24px;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: Tahoma, Arial, sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .eyeglass-widget-button:hover {
-  background-color: #357abd;
+  background-color: #f0c030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Floating button styles */
 .eyeglass-widget-floating-button {
   position: fixed;
   z-index: 9998;
-  padding: 15px;
+  padding: 15px 20px;
   border-radius: 60px 0 0 60px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   top: 50%;
   transform: translateY(-50%);
 }
@@ -61,7 +65,7 @@
 .eyeglass-widget-floating-button:hover .eyeglass-widget-button-text {
   max-width: 200px;
   opacity: 1;
-  margin-right: 5px;
+  margin-right: 8px;
 }
 
 /* Modal container */
@@ -74,100 +78,125 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   align-items: center;
   justify-content: center;
 }
 
 /* Modal content */
 .eyeglass-widget-modal-content {
-  background-color: #fefefe;
+  background-color: #fff;
   margin: auto;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
-  max-width: 600px;
+  max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* Close button */
 .eyeglass-widget-close-button {
   position: absolute;
   top: 15px;
-  left: 15px; /* Left since we're using RTL */
-  color: #666;
-  font-size: 24px;
+  left: 15px;
+  color: #fff;
+  font-size: 20px;
   font-weight: bold;
   cursor: pointer;
   z-index: 10;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
 }
 
 .eyeglass-widget-close-button:hover {
-  background-color: #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
 }
 
 /* Header section */
 .eyeglass-widget-modal-header {
-  background-color: #4a90e2;
+  background-color: #ff3838;
   color: white;
-  padding: 15px 20px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  padding: 18px 25px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 .eyeglass-widget-modal-header h2 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 500;
-  padding-left: 30px; /* Space for close button */
+  font-size: 22px;
+  font-weight: 600;
+  padding-left: 30px;
 }
 
 /* Body section */
 .eyeglass-widget-modal-body {
-  padding: 20px;
+  padding: 25px;
 }
 
 /* Upload section */
 .eyeglass-widget-upload-section {
   text-align: center;
-  padding: 20px 0;
+  padding: 25px 0;
 }
 
 .eyeglass-widget-upload-options {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 15px;
+  gap: 25px;
+  margin-top: 20px;
 }
 
 .eyeglass-widget-upload-button,
-.eyeglass-widget-camera-button,
-.eyeglass-widget-try-again-button {
-  background-color: #4a90e2;
-  color: white;
+.eyeglass-widget-camera-button {
+  background-color: #feda50;
+  color: #333;
   border: none;
-  border-radius: 4px;
-  padding: 10px 15px;
+  border-radius: 8px;
+  padding: 12px 20px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.eyeglass-widget-try-again-button {
+  background-color: #ff3838;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .eyeglass-widget-upload-button:hover,
-.eyeglass-widget-camera-button:hover,
+.eyeglass-widget-camera-button:hover {
+  background-color: #f0c030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
 .eyeglass-widget-try-again-button:hover {
-  background-color: #357abd;
+  background-color: #e62e2e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .eyeglass-widget-file-input {
@@ -176,8 +205,8 @@
 
 /* Icon inside buttons */
 .eyeglass-widget-button-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: inline-block;
 }
 
@@ -185,17 +214,17 @@
 .eyeglass-widget-processing-section {
   display: none;
   text-align: center;
-  padding: 30px 0;
+  padding: 40px 0;
 }
 
 .eyeglass-widget-spinner {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #4a90e2;
+  border-top: 4px solid #ff3838;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   animation: eyeglass-widget-spin 1s linear infinite;
-  margin: 0 auto 15px;
+  margin: 0 auto 20px;
 }
 
 @keyframes eyeglass-widget-spin {
@@ -210,84 +239,132 @@
 /* Results section */
 .eyeglass-widget-results-section {
   display: none;
-  padding: 20px 0;
+  padding: 25px 0;
 }
 
 .eyeglass-widget-face-shape-info {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .eyeglass-widget-face-shape-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+  margin-bottom: 15px;
+  color: #222;
 }
 
 .eyeglass-widget-face-shape-description {
   margin-bottom: 15px;
-  line-height: 1.5;
-  color: #555;
+  line-height: 1.6;
+  color: #444;
 }
 
 .eyeglass-widget-face-shape-recommendation {
-  background-color: #e9f5ff;
-  padding: 10px;
-  border-radius: 4px;
-  border-right: 4px solid #4a90e2;
+  background-color: #fff8e0;
+  padding: 15px;
+  border-radius: 8px;
+  border-right: 4px solid #feda50;
   margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 /* Frames section */
 .eyeglass-widget-recommended-frames {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  gap: 25px;
+  margin-top: 25px;
 }
 
 .eyeglass-widget-frame-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: none;
+  border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
 
 .eyeglass-widget-frame-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+.eyeglass-widget-frame-image-container {
+  position: relative;
+  overflow: hidden;
 }
 
 .eyeglass-widget-frame-image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
   border-bottom: 1px solid #eee;
+  transition: transform 0.3s;
+}
+
+.eyeglass-widget-frame-card:hover .eyeglass-widget-frame-image {
+  transform: scale(1.05);
+}
+
+.eyeglass-widget-frame-match-score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(254, 218, 80, 0.9);
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.eyeglass-widget-match-percentage {
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .eyeglass-widget-frame-details {
-  padding: 15px;
+  padding: 20px;
 }
 
 .eyeglass-widget-frame-name {
   font-weight: bold;
-  margin-bottom: 5px;
-  color: #333;
+  margin-bottom: 8px;
+  color: #222;
+  font-size: 16px;
 }
 
 .eyeglass-widget-frame-type {
   color: #666;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  display: inline-block;
+  background-color: #f5f5f5;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.eyeglass-widget-frame-price-container {
+  margin-bottom: 20px;
+}
+
+.eyeglass-widget-frame-regular-price {
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+  margin-left: 10px;
 }
 
 .eyeglass-widget-frame-price {
   font-weight: bold;
-  color: #4a90e2;
-  margin-bottom: 15px;
+  color: #ff3838;
+  font-size: 18px;
 }
 
 .eyeglass-widget-frame-action {
@@ -295,43 +372,49 @@
 }
 
 .eyeglass-widget-view-product {
-  background-color: #4a90e2;
-  color: white;
+  background-color: #feda50;
+  color: #333;
   border: none;
-  border-radius: 4px;
-  padding: 8px 15px;
+  border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   text-decoration: none;
   display: inline-block;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .eyeglass-widget-view-product:hover {
-  background-color: #357abd;
+  background-color: #f0c030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Error section */
 .eyeglass-widget-error-section {
   display: none;
   text-align: center;
-  padding: 30px 0;
-  color: #ff3b30;
+  padding: 40px 0;
+  color: #ff3838;
 }
 
 .eyeglass-widget-error-icon {
-  font-size: 40px;
-  margin-bottom: 15px;
+  font-size: 50px;
+  margin-bottom: 20px;
 }
 
 .eyeglass-widget-error-message {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 16px;
 }
 
 /* Camera section */
 .eyeglass-widget-camera-section {
   display: none;
   text-align: center;
-  padding: 20px 0;
+  padding: 25px 0;
 }
 
 .eyeglass-widget-camera-preview {
@@ -339,34 +422,38 @@
   max-width: 500px;
   height: 375px;
   background-color: #f5f5f5;
-  margin: 0 auto 20px;
-  border-radius: 8px;
+  margin: 0 auto 25px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .eyeglass-widget-camera-controls {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 .eyeglass-widget-capture-button {
-  background-color: #ff3b30;
+  background-color: #ff3838;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .eyeglass-widget-capture-button:hover {
-  background-color: #d9332b;
+  background-color: #e62e2e;
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 /* Responsive adjustments */
@@ -382,5 +469,15 @@
 
   .eyeglass-widget-modal-content {
     width: 95%;
+  }
+
+  .eyeglass-widget-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .eyeglass-widget-upload-button,
+  .eyeglass-widget-camera-button,
+  .eyeglass-widget-try-again-button {
+    width: 80%;
   }
 }
