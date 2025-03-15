@@ -26,9 +26,14 @@ module.exports = (env, argv) => {
       },
       compress: true,
       port: 3000,
+      host: "0.0.0.0", // این خط را اضافه کنید
       hot: true,
       open: true, // Automatically open browser
       historyApiFallback: true,
+      allowedHosts: "all", // این خط را اضافه کنید
+      headers: {
+        "Access-Control-Allow-Origin": "*", // این خط را اضافه کنید
+      },
     },
     module: {
       rules: [
