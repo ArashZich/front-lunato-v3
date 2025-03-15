@@ -13,7 +13,8 @@ class EyeglassWidget {
   constructor(options) {
     // تنظیمات پیش‌فرض
     this.config = {
-      apiEndpoint: "http://localhost:8000/api/v1/analyze", // مقدار پیش‌فرض
+      // apiEndpoint: "http://localhost:8000/api/v1/analyze", // مقدار پیش‌فرض
+      apiEndpoint: "https://api.glasses.arashzich.ir/api/v1/analyze", // مقدار پیش‌فرض
       buttonText: "پیشنهاد فریم عینک",
       floatingButton: true, // به صورت پیش‌فرض، دکمه شناور است
       position: "left", // به صورت پیش‌فرض، دکمه سمت چپ قرار می‌گیرد
