@@ -32,6 +32,7 @@ class EyeglassWidget {
       headerText: "پیشنهاد فریم عینک مناسب",
       uploadInstructionText:
         "تصویری از صورت خود آپلود کنید یا از دوربین استفاده کنید",
+      faceGuideText: "صورت خود را داخل کادر قرار دهید",
       autoInitialize: true,
       ...options,
     };
@@ -138,9 +139,16 @@ class EyeglassWidget {
               </div>
             </div>
             
-            <!-- بخش دوربین -->
+            <!-- بخش دوربین - با کادر راهنمای چهره -->
             <div class="eyeglass-widget-camera-section">
-              <video class="eyeglass-widget-camera-preview" autoplay playsinline></video>
+              <div class="eyeglass-widget-camera-container">
+                <video class="eyeglass-widget-camera-preview" autoplay playsinline></video>
+                <!-- کادر راهنمای چهره -->
+                <div class="eyeglass-widget-face-guide-overlay">
+                  <div class="eyeglass-widget-face-outline"></div>
+                  <div class="eyeglass-widget-guide-text">${this.config.faceGuideText}</div>
+                </div>
+              </div>
               <div class="eyeglass-widget-camera-controls">
                 <button class="eyeglass-widget-capture-button">📷</button>
               </div>
