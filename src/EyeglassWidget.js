@@ -44,6 +44,12 @@ class EyeglassWidget {
       faceDetectionModelsPath: "/models", // مسیر مدل‌های تشخیص چهره
       faceNotDetectedText: "چهره‌ای تشخیص داده نشد",
 
+      // تنظیمات مربوط به فاصله چهره
+      tooFarText: "لطفاً کمی نزدیک‌تر شوید",
+      tooCloseText: "لطفاً کمی دورتر شوید",
+      minFaceWidthRatio: 0.2, // حداقل نسبت عرض چهره به عرض تصویر (خیلی دور نباشد)
+      maxFaceWidthRatio: 0.5, // حداکثر نسبت عرض چهره به عرض تصویر (خیلی نزدیک نباشد)
+
       autoInitialize: true,
       ...options,
     };
@@ -125,6 +131,9 @@ class EyeglassWidget {
   /**
    * ایجاد مدال و تمام بخش‌های آن
    */
+  /**
+   * ایجاد مدال و تمام بخش‌های آن
+   */
   createModal() {
     // ایجاد عنصر مدال
     const modal = document.createElement("div");
@@ -133,74 +142,77 @@ class EyeglassWidget {
 
     // محتوای مدال
     modal.innerHTML = `
-        <div class="eyeglass-widget-modal-content">
-          <div class="eyeglass-widget-modal-header">
-            <h2>${this.config.headerText}</h2>
-            <span class="eyeglass-widget-close-button">${this.config.closeButtonText}</span>
+      <div class="eyeglass-widget-modal-content">
+        <div class="eyeglass-widget-modal-header">
+          <h2>${this.config.headerText}</h2>
+          <span class="eyeglass-widget-close-button">${this.config.closeButtonText}</span>
+        </div>
+        <div class="eyeglass-widget-modal-body">
+          <!-- بخش آپلود -->
+          <div class="eyeglass-widget-upload-section">
+            <p>${this.config.uploadInstructionText}</p>
+            <div class="eyeglass-widget-upload-options">
+              <button class="eyeglass-widget-upload-button">
+                <span class="eyeglass-widget-button-icon">📂</span>
+                ${this.config.uploadButtonText}
+              </button>
+              <input type="file" class="eyeglass-widget-file-input" accept="image/*">
+              <button class="eyeglass-widget-camera-button">
+                <span class="eyeglass-widget-button-icon">📷</span>
+                ${this.config.cameraButtonText}
+              </button>
+            </div>
           </div>
-          <div class="eyeglass-widget-modal-body">
-            <!-- بخش آپلود -->
-            <div class="eyeglass-widget-upload-section">
-              <p>${this.config.uploadInstructionText}</p>
-              <div class="eyeglass-widget-upload-options">
-                <button class="eyeglass-widget-upload-button">
-                  <span class="eyeglass-widget-button-icon">📂</span>
-                  ${this.config.uploadButtonText}
-                </button>
-                <input type="file" class="eyeglass-widget-file-input" accept="image/*">
-                <button class="eyeglass-widget-camera-button">
-                  <span class="eyeglass-widget-button-icon">📷</span>
-                  ${this.config.cameraButtonText}
-                </button>
+          
+          <!-- بخش دوربین - با کادر راهنمای چهره و نشانگرهای فاصله -->
+          <div class="eyeglass-widget-camera-section">
+            <div class="eyeglass-widget-camera-container">
+              <video class="eyeglass-widget-camera-preview" autoplay playsinline></video>
+              <!-- کادر راهنمای چهره و نشانگرهای فاصله -->
+              <div class="eyeglass-widget-face-guide-overlay">
+                <div class="eyeglass-widget-face-outline"></div>
+                <div class="eyeglass-widget-guide-text">${this.config.faceGuideText}</div>
+                <!-- نشانگرهای فاصله -->
+                <div class="eyeglass-widget-distance-indicator eyeglass-widget-distance-too-far">⬈</div>
+                <div class="eyeglass-widget-distance-indicator eyeglass-widget-distance-too-close">⬊</div>
               </div>
             </div>
-            
-            <!-- بخش دوربین - با کادر راهنمای چهره -->
-            <div class="eyeglass-widget-camera-section">
-              <div class="eyeglass-widget-camera-container">
-                <video class="eyeglass-widget-camera-preview" autoplay playsinline></video>
-                <!-- کادر راهنمای چهره -->
-                <div class="eyeglass-widget-face-guide-overlay">
-                  <div class="eyeglass-widget-face-outline"></div>
-                  <div class="eyeglass-widget-guide-text">${this.config.faceGuideText}</div>
-                </div>
-              </div>
-              <div class="eyeglass-widget-camera-controls">
-                <button class="eyeglass-widget-capture-button">📷</button>
-              </div>
+            <div class="eyeglass-widget-camera-controls">
+              <button class="eyeglass-widget-capture-button">📷</button>
+            </div>
+          </div>
+          
+          <!-- بخش پردازش -->
+          <div class="eyeglass-widget-processing-section">
+            <div class="eyeglass-widget-spinner"></div>
+            <p>${this.config.processingText}</p>
+          </div>
+          
+          <!-- بخش نتایج -->
+          <div class="eyeglass-widget-results-section">
+            <div class="eyeglass-widget-face-shape-info">
+              <div class="eyeglass-widget-face-shape-title">شکل صورت: <span class="eyeglass-widget-face-shape-name"></span></div>
+              <div class="eyeglass-widget-face-shape-description"></div>
+              <div class="eyeglass-widget-face-shape-recommendation"></div>
             </div>
             
-            <!-- بخش پردازش -->
-            <div class="eyeglass-widget-processing-section">
-              <div class="eyeglass-widget-spinner"></div>
-              <p>${this.config.processingText}</p>
-            </div>
+            <h3>فریم‌های پیشنهادی</h3>
+            <div class="eyeglass-widget-recommended-frames"></div>
             
-            <!-- بخش نتایج -->
-            <div class="eyeglass-widget-results-section">
-              <div class="eyeglass-widget-face-shape-info">
-                <div class="eyeglass-widget-face-shape-title">شکل صورت: <span class="eyeglass-widget-face-shape-name"></span></div>
-                <div class="eyeglass-widget-face-shape-description"></div>
-                <div class="eyeglass-widget-face-shape-recommendation"></div>
-              </div>
-              
-              <h3>فریم‌های پیشنهادی</h3>
-              <div class="eyeglass-widget-recommended-frames"></div>
-              
-              <div style="text-align: center; margin-top: 20px;">
-                <button class="eyeglass-widget-try-again-button">${this.config.tryAgainText}</button>
-              </div>
-            </div>
-            
-            <!-- بخش خطا -->
-            <div class="eyeglass-widget-error-section">
-              <div class="eyeglass-widget-error-icon">❌</div>
-              <div class="eyeglass-widget-error-message"></div>
+            <div style="text-align: center; margin-top: 20px;">
               <button class="eyeglass-widget-try-again-button">${this.config.tryAgainText}</button>
             </div>
           </div>
+          
+          <!-- بخش خطا -->
+          <div class="eyeglass-widget-error-section">
+            <div class="eyeglass-widget-error-icon">❌</div>
+            <div class="eyeglass-widget-error-message"></div>
+            <button class="eyeglass-widget-try-again-button">${this.config.tryAgainText}</button>
+          </div>
         </div>
-      `;
+      </div>
+    `;
 
     // افزودن مدال به body
     document.body.appendChild(modal);
@@ -371,6 +383,9 @@ class EyeglassWidget {
   /**
    * تشخیص چهره در جریان زنده دوربین
    */
+  /**
+   * تشخیص چهره در جریان زنده دوربین
+   */
   async detectFace() {
     if (
       !this.config.faceDetectionEnabled ||
@@ -392,6 +407,14 @@ class EyeglassWidget {
       );
       const guideText = this.modal.querySelector(".eyeglass-widget-guide-text");
 
+      // پاک کردن تمام کلاس‌های قبلی
+      guideText.classList.remove(
+        "eyeglass-widget-guide-success",
+        "eyeglass-widget-guide-warning",
+        "eyeglass-widget-warning-too-far",
+        "eyeglass-widget-warning-too-close"
+      );
+
       // اگر چهره‌ای تشخیص داده شد
       if (detections.length > 0) {
         // بررسی موقعیت چهره نسبت به کادر راهنما
@@ -411,23 +434,53 @@ class EyeglassWidget {
         const distanceX = Math.abs(faceCenterX - centerX) / (videoWidth / 2);
         const distanceY = Math.abs(faceCenterY - centerY) / (videoHeight / 2);
 
-        // اگر چهره در محدوده مناسب باشد (فاصله کمتر از 30%)
+        // محاسبه نسبت اندازه چهره به عرض ویدیو (برای تشخیص فاصله)
+        const faceWidthRatio = faceBox.width / videoWidth;
+
+        // محاسبه نسبت اندازه چهره به ارتفاع ویدیو (برای تشخیص فاصله)
+        const faceHeightRatio = faceBox.height / videoHeight;
+
+        // بررسی موقعیت چهره و فاصله مناسب
         if (
+          // چهره در مرکز قرار دارد
           distanceX < 0.3 &&
           distanceY < 0.3 &&
-          faceBox.width > videoWidth * 0.2
+          // چهره در فاصله مناسب است (نه خیلی دور، نه خیلی نزدیک)
+          faceWidthRatio >= this.config.minFaceWidthRatio &&
+          faceWidthRatio <= this.config.maxFaceWidthRatio
         ) {
+          // چهره در موقعیت مناسب است
           this.isFaceInPosition = true;
           captureButton.disabled = false;
           captureButton.classList.add("eyeglass-widget-capture-ready");
           guideText.textContent = this.config.facePositionMessage;
           guideText.classList.add("eyeglass-widget-guide-success");
+        } else if (faceWidthRatio < this.config.minFaceWidthRatio) {
+          // چهره خیلی دور است
+          this.isFaceInPosition = false;
+          captureButton.disabled = true;
+          captureButton.classList.remove("eyeglass-widget-capture-ready");
+          guideText.textContent = this.config.tooFarText;
+          guideText.classList.add(
+            "eyeglass-widget-guide-warning",
+            "eyeglass-widget-warning-too-far"
+          );
+        } else if (faceWidthRatio > this.config.maxFaceWidthRatio) {
+          // چهره خیلی نزدیک است
+          this.isFaceInPosition = false;
+          captureButton.disabled = true;
+          captureButton.classList.remove("eyeglass-widget-capture-ready");
+          guideText.textContent = this.config.tooCloseText;
+          guideText.classList.add(
+            "eyeglass-widget-guide-warning",
+            "eyeglass-widget-warning-too-close"
+          );
         } else {
+          // چهره در مرکز قرار ندارد
           this.isFaceInPosition = false;
           captureButton.disabled = true;
           captureButton.classList.remove("eyeglass-widget-capture-ready");
           guideText.textContent = this.config.faceGuideText;
-          guideText.classList.remove("eyeglass-widget-guide-success");
         }
       } else {
         // اگر چهره‌ای تشخیص داده نشد
@@ -435,7 +488,6 @@ class EyeglassWidget {
         captureButton.disabled = true;
         captureButton.classList.remove("eyeglass-widget-capture-ready");
         guideText.textContent = this.config.faceNotDetectedText;
-        guideText.classList.remove("eyeglass-widget-guide-success");
       }
 
       // ادامه تشخیص در فاصله زمانی مشخص

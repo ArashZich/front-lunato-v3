@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin"); // برای کپی کردن مدل‌ها
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production";
@@ -19,20 +20,35 @@ module.exports = (env, argv) => {
       umdNamedDefine: true,
       globalObject: "this",
     },
+    resolve: {
+      fallback: {
+        // شبیه‌سازی ماژول‌های Node.js برای face-api.js
+        fs: false,
+        path: false,
+        util: false,
+        crypto: false,
+      },
+    },
     devtool: isProduction ? "source-map" : "inline-source-map",
     devServer: {
-      static: {
-        directory: path.join(__dirname, "dist"),
-      },
+      static: [
+        {
+          directory: path.join(__dirname, "dist"),
+        },
+        {
+          directory: path.join(__dirname, "public"),
+          publicPath: "/",
+        },
+      ],
       compress: true,
       port: 3000,
-      host: "0.0.0.0", // این خط را اضافه کنید
+      host: "0.0.0.0",
       hot: true,
-      open: true, // Automatically open browser
+      open: true,
       historyApiFallback: true,
-      allowedHosts: "all", // این خط را اضافه کنید
+      allowedHosts: "all",
       headers: {
-        "Access-Control-Allow-Origin": "*", // این خط را اضافه کنید
+        "Access-Control-Allow-Origin": "*",
       },
     },
     module: {
@@ -49,10 +65,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.css$/,
-          use: [
-            "style-loader", // Always use style-loader to inject CSS into JS
-            "css-loader",
-          ],
+          use: ["style-loader", "css-loader"],
         },
       ],
     },
@@ -62,6 +75,15 @@ module.exports = (env, argv) => {
         template: "src/index.html",
         filename: "index.html",
         inject: "body",
+      }),
+      // کپی کردن مدل‌های face-api.js به پوشه dist
+      new CopyPlugin({
+        patterns: [
+          {
+            from: "public",
+            to: "",
+          },
+        ],
       }),
     ],
     optimization: {

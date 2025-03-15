@@ -575,6 +575,45 @@
   background-color: rgba(76, 175, 80, 0.8) !important;
 }
 
+/* استایل هشدار برای فاصله نامناسب */
+.eyeglass-widget-guide-warning {
+  background-color: rgba(255, 165, 0, 0.8) !important;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 165, 0, 0.5);
+}
+
+/* فلش اشاره‌گر فاصله */
+.eyeglass-widget-distance-indicator {
+  position: absolute;
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.eyeglass-widget-distance-too-far {
+  bottom: 50%;
+  right: 15%;
+  transform: rotate(45deg);
+}
+
+.eyeglass-widget-distance-too-close {
+  bottom: 50%;
+  left: 15%;
+  transform: rotate(-45deg);
+}
+
+/* نمایش فلش‌ها در حالت‌های هشدار فاصله */
+.eyeglass-widget-face-guide-overlay
+  .eyeglass-widget-warning-too-far
+  ~ .eyeglass-widget-distance-too-far,
+.eyeglass-widget-face-guide-overlay
+  .eyeglass-widget-warning-too-close
+  ~ .eyeglass-widget-distance-too-close {
+  opacity: 1;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .eyeglass-widget-upload-options {
