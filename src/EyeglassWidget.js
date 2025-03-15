@@ -1,6 +1,9 @@
 /**
  * EyeglassWidget - ویجت پیشنهاد فریم عینک مناسب با شکل صورت
+ * با قابلیت تشخیص موقعیت چهره
  */
+import * as faceapi from "face-api.js";
+
 class EyeglassWidget {
   /**
    * @param {Object} options - تنظیمات ویجت
@@ -33,6 +36,14 @@ class EyeglassWidget {
       uploadInstructionText:
         "تصویری از صورت خود آپلود کنید یا از دوربین استفاده کنید",
       faceGuideText: "صورت خود را داخل کادر قرار دهید",
+
+      // تنظیمات جدید مربوط به تشخیص چهره
+      faceDetectionEnabled: true, // فعال بودن تشخیص چهره
+      faceDetectionInterval: 100, // فاصله زمانی بین تشخیص‌ها (میلی‌ثانیه)
+      facePositionMessage: "چهره شما در موقعیت مناسب قرار گرفته است", // پیام وقتی چهره در موقعیت مناسب است
+      faceDetectionModelsPath: "/models", // مسیر مدل‌های تشخیص چهره
+      faceNotDetectedText: "چهره‌ای تشخیص داده نشد",
+
       autoInitialize: true,
       ...options,
     };
@@ -40,6 +51,11 @@ class EyeglassWidget {
     // دسترسی‌های دوربین
     this.stream = null;
     this.videoElement = null;
+
+    // متغیرهای مربوط به تشخیص چهره
+    this.faceDetectionLoaded = false;
+    this.faceDetectionTimer = null;
+    this.isFaceInPosition = false;
 
     if (this.config.autoInitialize) {
       this.initialize();
@@ -334,12 +350,116 @@ class EyeglassWidget {
   }
 
   /**
+   * بارگذاری مدل‌های تشخیص چهره
+   */
+  async loadFaceDetectionModels() {
+    if (this.faceDetectionLoaded) return;
+
+    try {
+      await faceapi.nets.tinyFaceDetector.loadFromUri(
+        this.config.faceDetectionModelsPath
+      );
+      this.faceDetectionLoaded = true;
+      console.log("مدل‌های تشخیص چهره با موفقیت بارگذاری شدند");
+    } catch (error) {
+      console.error("خطا در بارگذاری مدل‌های تشخیص چهره:", error);
+      // در صورت خطا، تشخیص چهره را غیرفعال می‌کنیم
+      this.config.faceDetectionEnabled = false;
+    }
+  }
+
+  /**
+   * تشخیص چهره در جریان زنده دوربین
+   */
+  async detectFace() {
+    if (
+      !this.config.faceDetectionEnabled ||
+      !this.videoElement ||
+      !this.videoElement.srcObject
+    )
+      return;
+
+    try {
+      // تشخیص چهره با استفاده از tiny face detector (سریع‌تر است)
+      const detections = await faceapi.detectAllFaces(
+        this.videoElement,
+        new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.5 })
+      );
+
+      // بررسی وضعیت دکمه و پیام راهنما
+      const captureButton = this.modal.querySelector(
+        ".eyeglass-widget-capture-button"
+      );
+      const guideText = this.modal.querySelector(".eyeglass-widget-guide-text");
+
+      // اگر چهره‌ای تشخیص داده شد
+      if (detections.length > 0) {
+        // بررسی موقعیت چهره نسبت به کادر راهنما
+        const faceBox = detections[0].box;
+        const videoWidth = this.videoElement.videoWidth;
+        const videoHeight = this.videoElement.videoHeight;
+
+        // محاسبه مرکز کادر راهنما (نسبت به ابعاد ویدیو)
+        const centerX = videoWidth / 2;
+        const centerY = videoHeight / 2;
+
+        // محاسبه مرکز چهره
+        const faceCenterX = faceBox.x + faceBox.width / 2;
+        const faceCenterY = faceBox.y + faceBox.height / 2;
+
+        // محاسبه فاصله مرکز چهره تا مرکز کادر (نسبی)
+        const distanceX = Math.abs(faceCenterX - centerX) / (videoWidth / 2);
+        const distanceY = Math.abs(faceCenterY - centerY) / (videoHeight / 2);
+
+        // اگر چهره در محدوده مناسب باشد (فاصله کمتر از 30%)
+        if (
+          distanceX < 0.3 &&
+          distanceY < 0.3 &&
+          faceBox.width > videoWidth * 0.2
+        ) {
+          this.isFaceInPosition = true;
+          captureButton.disabled = false;
+          captureButton.classList.add("eyeglass-widget-capture-ready");
+          guideText.textContent = this.config.facePositionMessage;
+          guideText.classList.add("eyeglass-widget-guide-success");
+        } else {
+          this.isFaceInPosition = false;
+          captureButton.disabled = true;
+          captureButton.classList.remove("eyeglass-widget-capture-ready");
+          guideText.textContent = this.config.faceGuideText;
+          guideText.classList.remove("eyeglass-widget-guide-success");
+        }
+      } else {
+        // اگر چهره‌ای تشخیص داده نشد
+        this.isFaceInPosition = false;
+        captureButton.disabled = true;
+        captureButton.classList.remove("eyeglass-widget-capture-ready");
+        guideText.textContent = this.config.faceNotDetectedText;
+        guideText.classList.remove("eyeglass-widget-guide-success");
+      }
+
+      // ادامه تشخیص در فاصله زمانی مشخص
+      this.faceDetectionTimer = setTimeout(
+        () => this.detectFace(),
+        this.config.faceDetectionInterval
+      );
+    } catch (error) {
+      console.error("خطا در تشخیص چهره:", error);
+    }
+  }
+
+  /**
    * باز کردن دوربین
    */
   async openCamera() {
     try {
       // نمایش بخش دوربین
       this.showSection("camera");
+
+      // اگر تشخیص چهره فعال است، مدل‌ها را بارگذاری کنید
+      if (this.config.faceDetectionEnabled && !this.faceDetectionLoaded) {
+        await this.loadFaceDetectionModels();
+      }
 
       // درخواست دسترسی به دوربین
       this.stream = await navigator.mediaDevices.getUserMedia({
@@ -353,6 +473,23 @@ class EyeglassWidget {
 
       // نمایش تصویر دوربین
       this.videoElement.srcObject = this.stream;
+
+      // غیرفعال کردن دکمه عکس‌برداری تا زمانی که چهره در موقعیت مناسب قرار گیرد
+      const captureButton = this.modal.querySelector(
+        ".eyeglass-widget-capture-button"
+      );
+      captureButton.disabled = true;
+
+      // منتظر ماندن برای آماده شدن ویدیو
+      this.videoElement.onloadedmetadata = () => {
+        // شروع تشخیص چهره
+        if (this.config.faceDetectionEnabled && this.faceDetectionLoaded) {
+          this.detectFace();
+        } else {
+          // اگر تشخیص چهره فعال نیست، دکمه را فعال کنید
+          captureButton.disabled = false;
+        }
+      };
     } catch (error) {
       console.error("خطا در دسترسی به دوربین:", error);
       // نمایش خطا
@@ -368,6 +505,11 @@ class EyeglassWidget {
   captureImage() {
     if (!this.videoElement || !this.stream) {
       this.showError("دوربین در دسترس نیست");
+      return;
+    }
+
+    // اگر تشخیص چهره فعال است و چهره در موقعیت مناسب نیست، جلوگیری از عکس‌برداری
+    if (this.config.faceDetectionEnabled && !this.isFaceInPosition) {
       return;
     }
 
@@ -407,6 +549,12 @@ class EyeglassWidget {
    * توقف دوربین
    */
   stopCamera() {
+    // توقف تایمر تشخیص چهره
+    if (this.faceDetectionTimer) {
+      clearTimeout(this.faceDetectionTimer);
+      this.faceDetectionTimer = null;
+    }
+
     if (this.stream) {
       this.stream.getTracks().forEach((track) => track.stop());
       this.stream = null;
@@ -560,8 +708,8 @@ class EyeglassWidget {
         // محاسبه امتیاز تطابق به صورت درصد (اگر موجود باشد)
         const matchScoreText = frame.match_score
           ? `<div class="eyeglass-widget-frame-match-score">
-              <span class="eyeglass-widget-match-percentage">${frame.match_score}%</span> تطابق
-             </div>`
+            <span class="eyeglass-widget-match-percentage">${frame.match_score}%</span> تطابق
+           </div>`
           : "";
 
         // ایجاد عنصر کارت
@@ -576,32 +724,32 @@ class EyeglassWidget {
 
         // پر کردن محتوای کارت
         frameCard.innerHTML = `
-            <div class="eyeglass-widget-frame-image-container">
-              <img class="eyeglass-widget-frame-image" src="${frameImage}" alt="${
+          <div class="eyeglass-widget-frame-image-container">
+            <img class="eyeglass-widget-frame-image" src="${frameImage}" alt="${
           frame.name
         }">
-              ${matchScoreText}
+            ${matchScoreText}
+          </div>
+          <div class="eyeglass-widget-frame-details">
+            <div class="eyeglass-widget-frame-name">${frame.name}</div>
+            <div class="eyeglass-widget-frame-type">${frame.frame_type}</div>
+            <div class="eyeglass-widget-frame-price-container">
+              ${
+                regularPrice
+                  ? `<span class="eyeglass-widget-frame-regular-price">${regularPrice} تومان</span>`
+                  : ""
+              }
+              <span class="eyeglass-widget-frame-price">${price} تومان</span>
             </div>
-            <div class="eyeglass-widget-frame-details">
-              <div class="eyeglass-widget-frame-name">${frame.name}</div>
-              <div class="eyeglass-widget-frame-type">${frame.frame_type}</div>
-              <div class="eyeglass-widget-frame-price-container">
-                ${
-                  regularPrice
-                    ? `<span class="eyeglass-widget-frame-regular-price">${regularPrice} تومان</span>`
-                    : ""
-                }
-                <span class="eyeglass-widget-frame-price">${price} تومان</span>
-              </div>
-              <div class="eyeglass-widget-frame-action">
-                <a href="${
-                  frame.permalink
-                }" target="_blank" class="eyeglass-widget-view-product">
-                  ${this.config.viewProductText}
-                </a>
-              </div>
+            <div class="eyeglass-widget-frame-action">
+              <a href="${
+                frame.permalink
+              }" target="_blank" class="eyeglass-widget-view-product">
+                ${this.config.viewProductText}
+              </a>
             </div>
-          `;
+          </div>
+        `;
 
         // افزودن کارت به لیست
         framesContainer.appendChild(frameCard);
